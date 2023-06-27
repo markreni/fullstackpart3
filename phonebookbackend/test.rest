@@ -1,0 +1,30 @@
+GET http://127.0.0.1:3001/api/persons/
+
+###
+
+HEAD http://127.0.0.1:3001/api/persons/
+
+###
+
+GET http://127.0.0.1:3001/api/persons/2
+
+###
+
+GET http://127.0.0.1:3001/api/info/
+
+###
+
+POST http://127.0.0.1:3001/api/persons/
+Content-Type: application/json
+
+{
+    "name": "Liisa Marttinen",
+    "number": "040-243563"
+}
+
+###
+
+DELETE http://127.0.0.1:3001/api/persons/2
+
+###
+
