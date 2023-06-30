@@ -13,11 +13,11 @@ app.use(express.json())
 morgan.token('body', request => JSON.stringify(request.body))
 
 app.use(morgan('tiny', {
-  skip: (request, response) => request.method === 'POST'
+  skip: (request) => request.method === 'POST'
 }))
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body', {
-  skip: (request, response) => request.method !== 'POST'
+  skip: (request) => request.method !== 'POST'
 }))
 
 const errorHandler = (error, request, response, next) => {
@@ -38,31 +38,31 @@ const unknownEndpoint = (request, response) => {
 
 /*
 let persons = [
-  { 
+  {
     "id": 1,
-    "name": "Arto Hellas", 
+    "name": "Arto Hellas",
     "number": "040-123456"
   },
-  { 
+  {
     "id": 2,
-    "name": "Ada Lovelace", 
+    "name": "Ada Lovelace",
     "number": "39-44-5323523"
   },
-  { 
+  {
     "id": 3,
-    "name": "Dan Abramov", 
+    "name": "Dan Abramov",
     "number": "12-43-234345"
   },
-  { 
+  {
     "id": 4,
-    "name": "Mary Poppendieck", 
+    "name": "Mary Poppendieck",
     "number": "39-23-6423122"
   }
 ]
 */
 
 app.get('/api/info', (request, response) => {
-  const requestDate = new Date();
+  const requestDate = new Date()
   Person.find({}).then(persons => {
     response.send(`
       <div>
@@ -70,41 +70,40 @@ app.get('/api/info', (request, response) => {
         <p>${requestDate}</p>
       </div>`
     )
-  }) 
+  })
 })
 
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
     response.json(persons)
-  }) 
+  })
 })
 
 app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
   if(!body.name && !body.number) {
-    return response.status(400).json({ 
-      error: 'name and number are missing' 
+    return response.status(400).json({
+      error: 'name and number are missing'
     })
   } else if(!body.name) {
-    return response.status(400).json({ 
-      error: 'name is missing' 
+    return response.status(400).json({
+      error: 'name is missing'
     })
   } else if(!body.number) {
-    return response.status(400).json({ 
-      error: 'number is missing' 
+    return response.status(400).json({
+      error: 'number is missing'
     })
   }
-  
   const person = new Person({
     name: body.name,
     number: body.number
   })
   person.save()
-  .then(savedPerson => {
-    response.json(savedPerson)
-  })
-  .catch(error => next(error))
+    .then(savedPerson => {
+      response.json(savedPerson)
+    })
+    .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
@@ -123,22 +122,22 @@ app.put('/api/persons/:id', (request, response, next) => {
   const { name, number } = request.body
 
   Person.findByIdAndUpdate(
-    request.params.id, 
-    { name, number }, 
+    request.params.id,
+    { name, number },
     { new: true, runValidators: true, context: 'query' }
   )
     .then(updatedPerson => {
-    response.json(updatedPerson)
-  })
-  .catch(error => next(error))
+      response.json(updatedPerson)
+    })
+    .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
-  .then(result => {
-    response.status(204).end()
-  })
-  .catch(error => next(error))
+    .then(() => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
 })
 
 app.use(unknownEndpoint)
